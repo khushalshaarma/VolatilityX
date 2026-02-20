@@ -1,37 +1,61 @@
-AI Quant Trading Intelligence Dashboard
+VolatilityX — AI Quant Trading Intelligence
 
-Overview
-This repository scaffolds a production-ready AI-powered trading intelligence dashboard.
-It includes a Next.js TypeScript frontend, a FastAPI Python backend, basic model training stubs,
-indicator computations, a backtesting engine, and example integration with Binance (websocket)
-and news sentiment. This is a starting point — components are modular so you can extend them.
+VolatilityX is an AI-powered trading intelligence dashboard combining real-time market data, technical indicators, backtesting, and modular machine learning pipelines.
 
-Folder layout
-- frontend/        Next.js + TypeScript + Tailwind + Lightweight Charts + Zustand
-- backend/         FastAPI app, services, indicators, backtest_engine
-- models/          model ensemble utilities and model stubs
+Inspired by platforms like TradingView and QuantConnect, VolatilityX focuses on AI-driven decision support and risk-aware strategy analysis.
 
-Quickstart (local dev)
-1) Backend
-   cd backend
-   python -m venv .venv
-   .venv\Scripts\activate  # windows
-   pip install -r requirements.txt
-   cp .env.example .env
-   # create DB (Postgres) and set DATABASE_URL in .env
-   uvicorn app.main:app --reload --port 8000
+🔥 Features
 
-2) Frontend
-   cd frontend
-   npm install
-   npm run dev
+📊 Live crypto market dashboard (Binance-ready)
 
-Environment variables
-- .env.example contains the environment variable names used by the backend.
+📈 Advanced technical indicators (RSI, MACD, EMA, Bollinger, ATR, VWAP)
 
-Next steps
-- Train real models (see backend/models/train_models.py)
-- Wire realtime Binance API keys (BINANCE_API_KEY, BINANCE_SECRET)
-- Replace mock data with live data; tune TA-Lib installs as needed
+🧠 AI prediction engine (ensemble-ready architecture)
 
-For details, read backend/README.md and frontend/README.md
+🧪 Strategy builder + backtesting engine
+
+💼 Paper trading simulation
+
+📰 Extensible sentiment integration
+
+⚙️ Modular full-stack architecture
+
+🏗️ Tech Stack
+
+Frontend
+
+Next.js (TypeScript)
+
+Tailwind CSS
+
+Lightweight Charts
+
+Zustand
+
+Backend
+
+FastAPI
+
+Pandas + NumPy
+
+Modular indicator & backtesting engine
+
+ML model stubs (LSTM, XGBoost, Logistic Regression)
+
+⚙️ Quick Start
+Backend
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+Frontend
+cd frontend
+npm install
+npm run dev
+
+Open: http://localhost:3000
+
+⚠️ Disclaimer
+
+For research and educational purposes only. Not financial advice.
