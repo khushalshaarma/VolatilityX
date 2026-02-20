@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+numpy
+pandas
+scikit-learn
+xgboost
+tensorflow
+ta-lib
+psycopg2-binary
+sqlalchemy
+alembic
+websockets
+python-binance
+requests
