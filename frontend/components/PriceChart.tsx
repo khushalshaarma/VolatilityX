@@ -39,19 +39,24 @@ export default function PriceChart({ symbol = 'XAUUSD', small = false }: Props) 
       const baseMap: Record<string, number> = { XAUUSD: 1900, XAGUSD: 24, EURUSD: 1.08 }
       let base = baseMap[symbol] ?? 100
 
-      // create initial candles (one per minute for last 60 minutes)
-      const now = Date.now()
-      const oneMin = 60 * 1000
-      const candles: any[] = []
-      for (let i = 60; i >= 0; i--) {
-        const t = new Date(now - i * oneMin)
-        const open = base + (Math.random() - 0.5) * (base * 0.002)
-        const close = open + (Math.random() - 0.5) * (base * 0.003)
-        const high = Math.max(open, close) + Math.random() * (base * 0.0015)
-        const low = Math.min(open, close) - Math.random() * (base * 0.0015)
-        const point = { time: Math.floor(t.getTime() / 1000), open, high, low, close }
-        candles.push(point)
-        base = close
+      // create initial candles using DataFeed when available
+      const feed = (await import('../context/DataFeedContext' as any)).useDataFeed?.()
+      let candles: any[] = []
+      if (feed) {
+        candles = await feed.getHistory(symbol, 200)
+      } else {
+        const now = Date.now()
+        const oneMin = 60 * 1000
+        for (let i = 60; i >= 0; i--) {
+          const t = new Date(now - i * oneMin)
+          const open = base + (Math.random() - 0.5) * (base * 0.002)
+          const close = open + (Math.random() - 0.5) * (base * 0.003)
+          const high = Math.max(open, close) + Math.random() * (base * 0.0015)
+          const low = Math.min(open, close) - Math.random() * (base * 0.0015)
+          const point = { time: Math.floor(t.getTime() / 1000), open, high, low, close }
+          candles.push(point)
+          base = close
+        }
       }
 
       candleSeries.setData(candles)
@@ -59,7 +64,24 @@ export default function PriceChart({ symbol = 'XAUUSD', small = false }: Props) 
 
       chartApiRef.current = { chart, candleSeries, lineSeries }
 
-      // simulated live updates: append a new candle every second
+      // subscribe to feed updates when available via exported hook functions
+      let unsub: (() => void) | undefined
+      try {
+        const feedModule = await import('../context/DataFeedContext')
+        const api = feedModule as any
+        if (api && api.subscribe) {
+          unsub = api.subscribe(symbol, (newBar: any) => {
+            candles.push(newBar)
+            if (candles.length > 500) candles.shift()
+            candleSeries.update(newBar)
+            lineSeries.update({ time: newBar.time, value: newBar.close })
+          })
+        }
+      } catch (e) {
+        // ignore if feed module not usable here
+      }
+
+      // fallback simulator interval
       const interval = setInterval(() => {
         if (!chartApiRef.current) return
         const { candleSeries: cs, lineSeries: ls } = chartApiRef.current
@@ -70,7 +92,6 @@ export default function PriceChart({ symbol = 'XAUUSD', small = false }: Props) 
         const high = Math.max(open, close) + Math.random() * (open * 0.0008)
         const low = Math.min(open, close) - Math.random() * (open * 0.0008)
         const newBar = { time: nextTime, open, high, low, close }
-        // rotate array to keep memory low
         candles.push(newBar)
         if (candles.length > 500) candles.shift()
         cs.update(newBar)
