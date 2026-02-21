@@ -43,3 +43,17 @@ body {
 
 .muted { color: var(--muted); }
 .accent { color: var(--accent); }
+
+/* TradingView-like layout tweaks */
+.tv-container { }
+.tv-toolbar { display:flex; align-items:center; justify-content:space-between }
+.tv-main { }
+
+/* make lightweight-charts have rounded background */
+.tv-main .card > div { border-radius: 6px; overflow: hidden }
+
+/* sidebar watchlist styling */
+.tv-main aside .card { background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); }
+
+/* small utility */
+.bg-dim { background: rgba(255,255,255,0.02) }
