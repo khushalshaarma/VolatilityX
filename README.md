@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 AI Quant Trading Intelligence Dashboard (TradAI)
 
 Purpose
@@ -144,4 +144,4 @@ Open: http://localhost:3000
 ⚠️ Disclaimer
 
 For research and educational purposes only. Not financial advice.
->>>>>>> 1cc9902aedeaf29e2ad58d7772cdd2e05088d92d
+
