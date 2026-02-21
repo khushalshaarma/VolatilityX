@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PriceChart from './PriceChart'
+import LeftTools from './LeftTools'
 
 const MAJOR_SYMBOLS = [
   'EURUSD', 'GBPUSD', 'USDJPY', 'USDCAD', 'AUDUSD',
@@ -42,13 +43,16 @@ export default function ChartGrid() {
         </div>
       </div>
 
-      <div className="tv-main grid grid-cols-4 gap-4">
-        <div className="col-span-3 card p-3">
+      <div className="tv-main grid grid-cols-12 gap-4">
+        <div className="col-span-1">
+          <LeftTools />
+        </div>
+        <div className="col-span-8 card p-3">
           <div className="mb-2 text-sm muted">Market — {active} · {timeframe}</div>
           <PriceChart symbol={active} />
         </div>
 
-        <aside className="col-span-1">
+        <aside className="col-span-3">
           <div className="card p-3 mb-4">
             <h3 className="text-sm font-medium mb-2">Watchlist</h3>
             <div className="grid gap-2">
