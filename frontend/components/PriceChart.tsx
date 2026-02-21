@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { useDataFeed } from '../context/DataFeedContext'
 
 type Props = { symbol?: string; small?: boolean }
 
@@ -6,6 +7,7 @@ type Props = { symbol?: string; small?: boolean }
 export default function PriceChart({ symbol = 'XAUUSD', small = false }: Props) {
   const chartRef = useRef<HTMLDivElement | null>(null)
   const chartApiRef = useRef<any>(null)
+  const feed = useDataFeed()
 
   useEffect(() => {
     let mounted = true
@@ -36,15 +38,19 @@ export default function PriceChart({ symbol = 'XAUUSD', small = false }: Props) 
       const lineSeries = chart.addLineSeries({ color: '#60a5fa', lineWidth: 2 })
 
       // starting bases to make symbols look sensible
-      const baseMap: Record<string, number> = { XAUUSD: 1900, XAGUSD: 24, EURUSD: 1.08 }
+      const baseMap: Record<string, number> = { XAUUSD: 1900, XAGUSD: 24, EURUSD: 1.08, BTCUSD: 30000, ETHUSD: 1800 }
       let base = baseMap[symbol] ?? 100
 
       // create initial candles using DataFeed when available
-      const feed = (await import('../context/DataFeedContext' as any)).useDataFeed?.()
       let candles: any[] = []
       if (feed) {
-        candles = await feed.getHistory(symbol, 200)
-      } else {
+        try {
+          candles = await feed.getHistory(symbol, 200)
+        } catch (e) {
+          candles = []
+        }
+      }
+      if (!candles || candles.length === 0) {
         const now = Date.now()
         const oneMin = 60 * 1000
         for (let i = 60; i >= 0; i--) {
@@ -64,21 +70,15 @@ export default function PriceChart({ symbol = 'XAUUSD', small = false }: Props) 
 
       chartApiRef.current = { chart, candleSeries, lineSeries }
 
-      // subscribe to feed updates when available via exported hook functions
+      // subscribe to feed updates when available via context
       let unsub: (() => void) | undefined
-      try {
-        const feedModule = await import('../context/DataFeedContext')
-        const api = feedModule as any
-        if (api && api.subscribe) {
-          unsub = api.subscribe(symbol, (newBar: any) => {
-            candles.push(newBar)
-            if (candles.length > 500) candles.shift()
-            candleSeries.update(newBar)
-            lineSeries.update({ time: newBar.time, value: newBar.close })
-          })
-        }
-      } catch (e) {
-        // ignore if feed module not usable here
+      if (feed && typeof feed.subscribe === 'function') {
+        unsub = feed.subscribe(symbol, (newBar: any) => {
+          candles.push(newBar)
+          if (candles.length > 500) candles.shift()
+          candleSeries.update(newBar)
+          lineSeries.update({ time: newBar.time, value: newBar.close })
+        })
       }
 
       // fallback simulator interval
@@ -107,6 +107,7 @@ export default function PriceChart({ symbol = 'XAUUSD', small = false }: Props) 
       ro.observe(container)
 
       return () => {
+        if (unsub) unsub()
         clearInterval(interval)
         ro.disconnect()
         chart.remove()
@@ -117,7 +118,7 @@ export default function PriceChart({ symbol = 'XAUUSD', small = false }: Props) 
     setup().then((c) => { if (c) cleanup = c }).catch(console.error)
 
     return () => { mounted = false; if (cleanup) cleanup() }
-  }, [symbol, small])
+  }, [symbol, small, feed])
 
   return (
     <div className="w-full">
