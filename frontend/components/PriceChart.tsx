@@ -76,6 +76,7 @@ export default function PriceChart({ symbol = 'XAUUSD', small = false }: Props) 
         cs.update(newBar)
         ls.update({ time: newBar.time, value: newBar.close })
       }, 1000)
+      // if in "local" mode we could connect to back-end ws here; placeholder for real data hookup
 
       chart.subscribeCrosshairMove(() => {})
       const ro = new ResizeObserver(() => {

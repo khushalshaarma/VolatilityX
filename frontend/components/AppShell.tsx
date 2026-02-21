@@ -2,6 +2,7 @@ import React, { PropsWithChildren } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useDataMode } from '../context/DataContext'
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard' },
@@ -12,6 +13,7 @@ const navItems = [
 
 export default function AppShell({ children }: PropsWithChildren) {
   const { pathname } = useRouter()
+  const { mode, setMode } = useDataMode()
 
   return (
     <div className="app-shell">
@@ -30,7 +32,13 @@ export default function AppShell({ children }: PropsWithChildren) {
         </nav>
         <div className="mt-6 card p-4">
           <div className="text-xs muted">Account</div>
-          <div className="font-medium"><Link href="/account">Demo / Local</Link></div>
+          <div className="font-medium flex items-center justify-between">
+            <Link href="/account">{mode === 'demo' ? 'Demo' : 'Local'}</Link>
+            <select value={mode} onChange={(e) => setMode(e.target.value as any)} className="bg-transparent text-sm">
+              <option value="demo">Demo</option>
+              <option value="local">Local</option>
+            </select>
+          </div>
         </div>
       </aside>
 
